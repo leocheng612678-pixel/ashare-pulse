@@ -1,0 +1,1 @@
+{"version":1,"weights":{"trend":30.0,"flow":30.0,"breadth":30.0,"futures":10.0},"baseline_weights":{"trend":30.0,"flow":30.0,"breadth":30.0,"futures":10.0},"update_count":0,"last_adapted":null,"metrics":{"sample_count":0,"minimum_required":20,"ic":{},"hit_rate_5d":null,"directional_median_5d":null,"circuit_breaker":false}}

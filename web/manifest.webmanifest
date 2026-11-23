@@ -1,0 +1,19 @@
+{
+  "name": "A股资金脉搏",
+  "short_name": "资金脉搏",
+  "description": "资金流、市场广度、期指升贴水、主动选股与仓位计划",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#07100e",
+  "theme_color": "#0e1816",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

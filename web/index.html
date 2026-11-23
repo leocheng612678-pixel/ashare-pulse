@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#0e1816">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="A股资金脉搏">
+  <meta name="description" content="A股资金、成交额、期指升贴水、ARMS广度与仓位参考仪表盘">
+  <title>A股资金脉搏</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="A股资金脉搏首页">
+      <span class="brand-mark"><span></span><span></span><span></span></span>
+      <span class="brand-copy">
+        <strong>A股资金脉搏</strong>
+        <small>MARKET PULSE / CN</small>
+      </span>
+    </a>
+    <div class="topbar-actions">
+      <div class="quote-status">
+        <span class="status-dot" id="status-dot"></span>
+        <div>
+          <span id="trade-date">正在读取行情</span>
+          <small id="generated-at">本地数据缓存</small>
+        </div>
+      </div>
+      <button
+        class="refresh-button mobile-access-button"
+        id="mobile-share-button"
+        type="button"
+        aria-label="生成任意手机可访问的公网链接"
+      >
+        <span aria-hidden="true">◫</span>
+        <span class="mobile-access-wide">手机访问</span>
+        <span class="mobile-access-short">手机</span>
+      </button>
+      <button class="refresh-button" id="refresh-button" type="button">
+        <span class="refresh-icon" aria-hidden="true">↻</span>
+        刷新数据
+      </button>
+    </div>
+  </header>
+
+  <div class="connection-banner" id="connection-banner" hidden>
+    <span id="connection-message">手机服务暂时离线，正在等待恢复。</span>
+    <button type="button" id="retry-connection">重新连接</button>
+  </div>
+
+  <main class="page-shell">
+    <section class="hero panel">
+      <div class="signal-block">
+        <div class="eyebrow">综合市场信号</div>
+        <div class="score-layout">
+          <div class="gauge" aria-label="综合评分">
+            <svg viewBox="0 0 140 140" role="img">
+              <circle class="gauge-track" cx="70" cy="70" r="54"></circle>
+              <circle class="gauge-value" id="gauge-value" cx="70" cy="70" r="54"></circle>
+            </svg>
+            <div class="gauge-center">
+              <strong id="market-score">--</strong>
+              <small>市场评分</small>
+            </div>
+          </div>
+          <div class="signal-copy">
+            <div class="regime-line">
+              <span class="regime" id="market-regime">读取中</span>
+              <span class="confidence" id="confidence-badge">置信度 --</span>
+            </div>
+            <h1 id="action-title">正在分析资金与市场广度</h1>
+            <p id="action-summary">数据载入后，会给出仓位区间与分批执行条件。</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-grid">
+        <article class="metric-card">
+          <div class="metric-label">两市成交额</div>
+          <strong class="metric-value" id="metric-turnover">--</strong>
+          <span class="metric-note" id="metric-turnover-note">较20日均额 --</span>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">主力净流入</div>
+          <strong class="metric-value" id="metric-flow">--</strong>
+          <span class="metric-note" id="metric-flow-note">沪深指数口径</span>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">ARMS / TRIN</div>
+          <strong class="metric-value" id="metric-arms">--</strong>
+          <span class="metric-note" id="metric-arms-note">全A涨跌量能结构</span>
+        </article>
+        <article class="metric-card">
+          <div class="metric-label">IF 主力基差</div>
+          <strong class="metric-value" id="metric-basis">--</strong>
+          <span class="metric-note" id="metric-basis-note">相对沪深300</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel asset-decision-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">ASSET DECISION</div>
+          <h2>今天买什么、卖什么，还是空仓</h2>
+        </div>
+        <span class="decision-badge" id="asset-choice-badge">计算中</span>
+      </div>
+      <div class="asset-decision-grid">
+        <div class="decision-core">
+          <span>当前选择</span>
+          <strong id="asset-choice">--</strong>
+          <p id="asset-reason">正在读取市场状态和资产条件。</p>
+          <div class="decision-target">
+            <span>权益目标</span>
+            <strong id="asset-target">--</strong>
+          </div>
+        </div>
+        <div class="decision-column">
+          <h3><span class="decision-number">01</span> 买入</h3>
+          <div id="asset-buy" class="decision-copy">--</div>
+        </div>
+        <div class="decision-column">
+          <h3><span class="decision-number">02</span> 卖出 / 减仓</h3>
+          <div id="asset-sell" class="decision-copy">--</div>
+        </div>
+        <div class="decision-column cash-column">
+          <h3><span class="decision-number">03</span> 现金</h3>
+          <div id="asset-cash" class="decision-copy">--</div>
+        </div>
+      </div>
+
+      <div class="asset-checker">
+        <div class="asset-checker-head">
+          <div>
+            <h3>持仓体检 / 个股观察池</h3>
+            <p>输入 6 位代码，多个代码用逗号或换行分隔，最多 10 个。</p>
+          </div>
+          <div class="role-tabs" role="group" aria-label="分析模式">
+            <button type="button" data-asset-role="holdings" class="active">实际持仓</button>
+            <button type="button" data-asset-role="watch">观察池</button>
+          </div>
+        </div>
+        <div class="asset-input-row">
+          <textarea
+            id="asset-codes"
+            rows="2"
+            spellcheck="false"
+            placeholder="例如：600519, 510300, 159915"
+          ></textarea>
+          <button type="button" class="check-button" id="check-assets">开始检查</button>
+        </div>
+        <div id="asset-results" class="asset-results">
+          <div class="empty-state">录入持仓后，软件才能明确给出“卖出哪只”；未录入时不会猜测你的持仓。</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel framework-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">DECISION FRAMEWORK / CN-EQUITY-OBS-1</div>
+          <h2>完整决策链</h2>
+        </div>
+        <span class="decision-badge cash" id="framework-state">--</span>
+      </div>
+      <div class="framework-summary">
+        <div>
+          <span>当前行动</span>
+          <strong id="framework-posture">--</strong>
+        </div>
+        <div>
+          <span>信号一致性</span>
+          <strong id="framework-consistency">--</strong>
+        </div>
+        <div>
+          <span>股票漏斗</span>
+          <strong id="framework-funnel">--</strong>
+        </div>
+      </div>
+      <div class="framework-gates" id="framework-gates"></div>
+      <div class="framework-scenarios" id="framework-scenarios"></div>
+    </section>
+
+    <section class="panel adaptive-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">ADAPTIVE LEARNING</div>
+          <h2>自动学习与权重校准</h2>
+        </div>
+        <span class="panel-tag" id="adaptive-status">积累样本</span>
+      </div>
+      <div class="adaptive-summary">
+        <div><span>预测记录</span><strong id="adaptive-predictions">--</strong></div>
+        <div><span>完成5日 / 20日</span><strong id="adaptive-completed">--</strong></div>
+        <div><span>方向命中率</span><strong id="adaptive-hit-rate">--</strong></div>
+        <div><span>调权次数</span><strong id="adaptive-updates">--</strong></div>
+      </div>
+      <div class="adaptive-weights" id="adaptive-weights"></div>
+      <p class="active-stock-note">
+        至少积累20个已完成的5日预测、且距上次调权5天后才会更新权重。单次调整不超过2个百分点，避免追逐单日结果。
+      </p>
+    </section>
+
+    <section class="panel active-stocks-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">ACTIVE STOCK SCREEN</div>
+          <h2>全 A 主动选股</h2>
+        </div>
+        <div class="active-stock-actions">
+          <span class="panel-tag" id="active-stock-count">筛选全市场</span>
+          <button type="button" class="mini-button" id="refresh-stocks">重新选股</button>
+        </div>
+      </div>
+      <div class="active-stock-summary">
+        <div>
+          <span>筛选顺序</span>
+          <strong>流动性 → 趋势 → 动量 → 相对强弱 → 波动惩罚</strong>
+        </div>
+        <p id="active-stock-policy">
+          从全 A 股票中独立筛出技术面最强的流动性标的，不需要录入持仓。
+        </p>
+      </div>
+      <div id="active-stock-list" class="active-stock-list">
+        <div class="skeleton stock-skeleton"></div>
+        <div class="skeleton stock-skeleton"></div>
+        <div class="skeleton stock-skeleton"></div>
+      </div>
+      <p class="active-stock-note">
+        股票候选是量化观察名单，不是无条件买入指令。市场防守时会选出强势样本，但仍以空仓等待为主；只有评分转正并满足触发条件后才执行。
+      </p>
+    </section>
+
+    <section class="panel money-radar-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">BIG MONEY RADAR / BM-1</div>
+          <h2>大资金行为雷达</h2>
+        </div>
+        <span class="panel-tag" id="money-confidence">置信度 --</span>
+      </div>
+      <div class="money-radar-grid">
+        <div class="money-state">
+          <span>市场资金行为</span>
+          <strong id="money-state">--</strong>
+          <div class="money-score-row">
+            <span>行为评分</span>
+            <b id="money-score">--</b>
+          </div>
+          <p>持续性、超大单、资金加速度、价格背离和成交量共同评分。</p>
+        </div>
+        <div class="money-evidence">
+          <h3>算法证据</h3>
+          <ul id="money-evidence-list"></ul>
+        </div>
+        <div class="money-stocks">
+          <h3>候选股资金行为</h3>
+          <div id="money-stock-list"></div>
+        </div>
+      </div>
+      <p class="active-stock-note">
+        大资金行为由订单大小推断，不代表真实机构持仓。历史接口不可用时使用缓存和当日数据，并降低置信度。
+      </p>
+    </section>
+
+    <section class="layout-main">
+      <article class="panel chart-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">CAPITAL FLOW</div>
+            <h2>主力资金轨迹</h2>
+          </div>
+          <div class="legend">
+            <span><i class="legend-up"></i>净流入</span>
+            <span><i class="legend-down"></i>净流出</span>
+          </div>
+        </div>
+        <div class="chart-wrap" id="flow-chart">
+          <div class="skeleton chart-skeleton"></div>
+        </div>
+        <div class="chart-foot">
+          <span>最近 20 个交易日</span>
+          <span>沪市 + 深市指数资金流口径</span>
+        </div>
+      </article>
+
+      <article class="panel factor-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">SIGNAL STACK</div>
+            <h2>四维信号</h2>
+          </div>
+          <span class="panel-tag">-100 至 +100</span>
+        </div>
+        <div id="factor-list" class="factor-list">
+          <div class="skeleton factor-skeleton"></div>
+          <div class="skeleton factor-skeleton"></div>
+          <div class="skeleton factor-skeleton"></div>
+          <div class="skeleton factor-skeleton"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="layout-secondary">
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">MARKET BREADTH</div>
+            <h2>涨跌与量能宽度</h2>
+          </div>
+          <span class="panel-tag" id="breadth-coverage">覆盖 --</span>
+        </div>
+        <div class="breadth-numbers">
+          <div>
+            <span>上涨</span>
+            <strong class="positive" id="breadth-up">--</strong>
+          </div>
+          <div>
+            <span>平盘</span>
+            <strong id="breadth-flat">--</strong>
+          </div>
+          <div>
+            <span>下跌</span>
+            <strong class="negative" id="breadth-down">--</strong>
+          </div>
+        </div>
+        <div class="breadth-bar" aria-label="涨跌家数比例">
+          <span class="breadth-up" id="breadth-up-bar"></span>
+          <span class="breadth-flat" id="breadth-flat-bar"></span>
+          <span class="breadth-down" id="breadth-down-bar"></span>
+        </div>
+        <div class="breadth-details">
+          <div><span>涨停 / 跌停</span><strong id="limit-count">--</strong></div>
+          <div><span>上涨股成交占比</span><strong id="up-amount-ratio">--</strong></div>
+          <div><span>ARMS 解读</span><strong id="arms-reading">--</strong></div>
+          <div><span>上涨 / 下跌家数比</span><strong id="advance-decline-ratio">--</strong></div>
+          <div><span>上涨 / 下跌量比</span><strong id="volume-ad-ratio">--</strong></div>
+          <div><span>ARMS 5日均值</span><strong id="arms-average">--</strong></div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">INDEX FUTURES</div>
+            <h2>期指升贴水</h2>
+          </div>
+          <span class="panel-tag">主力连续</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>合约</th>
+                <th>期货</th>
+                <th>现货</th>
+                <th>基差</th>
+                <th>幅度</th>
+              </tr>
+            </thead>
+            <tbody id="futures-body">
+              <tr><td colspan="5"><div class="skeleton table-skeleton"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="table-note">
+          基差 = 期货价 − 现货指数。主力连续价格用于方向参考，实际套保需核对具体合约与到期日。
+        </p>
+      </article>
+    </section>
+
+    <section class="layout-secondary">
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">SECTOR FLOW</div>
+            <h2>行业资金风向</h2>
+          </div>
+          <span class="panel-tag">东方财富板块</span>
+        </div>
+        <div class="sector-columns">
+          <div>
+            <h3 class="sector-title positive">净流入前列</h3>
+            <div id="sector-inflow" class="sector-list"></div>
+          </div>
+          <div>
+            <h3 class="sector-title negative">净流出前列</h3>
+            <div id="sector-outflow" class="sector-list"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel indices-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">CORE INDICES</div>
+            <h2>核心指数</h2>
+          </div>
+          <span class="panel-tag">收盘快照</span>
+        </div>
+        <div id="indices-list" class="indices-list">
+          <div class="skeleton index-skeleton"></div>
+          <div class="skeleton index-skeleton"></div>
+          <div class="skeleton index-skeleton"></div>
+        </div>
+      </article>
+    </section>
+
+    <section class="panel planner-panel">
+      <div class="planner-copy">
+        <div class="eyebrow">POSITION PLAN</div>
+        <h2>把你的仓位拉回目标区间</h2>
+        <p>
+          依据市场评分给出总敞口区间，再用你的风险偏好、可用资金和当前仓位，拆成可执行的小步动作。
+        </p>
+        <div class="profile-tabs" role="group" aria-label="风险偏好">
+          <button type="button" data-risk="conservative">稳健</button>
+          <button type="button" data-risk="balanced" class="active">均衡</button>
+          <button type="button" data-risk="aggressive">进取</button>
+        </div>
+      </div>
+      <div class="planner-form">
+        <label>
+          <span>总资金（元）</span>
+          <input id="planner-capital" type="number" min="0" step="10000" value="100000">
+        </label>
+        <label>
+          <span>当前权益仓位</span>
+          <div class="range-row">
+            <input id="planner-position" type="range" min="0" max="100" step="1" value="40">
+            <output id="planner-position-value" for="planner-position">40%</output>
+          </div>
+        </label>
+        <div class="planner-result">
+          <div>
+            <span>建议目标区间</span>
+            <strong id="target-range">--</strong>
+          </div>
+          <div>
+            <span>相对目标中值</span>
+            <strong id="position-gap">--</strong>
+          </div>
+          <div>
+            <span>第一步动作</span>
+            <strong id="first-action">--</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="layout-rules">
+      <article class="panel rule-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">EXECUTION</div>
+            <h2>条件式执行方案</h2>
+          </div>
+        </div>
+        <div class="rule-grid" id="execution-rules"></div>
+      </article>
+      <article class="panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow">RISK RADAR</div>
+            <h2>风险雷达</h2>
+          </div>
+        </div>
+        <div id="risk-flags" class="risk-list"></div>
+      </article>
+    </section>
+
+    <section class="panel data-panel">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">DATA QUALITY</div>
+          <h2>数据源与可用性</h2>
+        </div>
+        <span class="panel-tag" id="quality-label">--</span>
+      </div>
+      <div id="source-list" class="source-list"></div>
+      <p class="disclaimer">
+        本工具是规则型市场研究辅助，不构成证券投资建议，也不保证任何收益。公开接口可能延迟、变更或中断；买卖前请核对交易所及券商行情，并根据自身风险承受能力独立决策。历史信号不代表未来表现。
+      </p>
+    </section>
+  </main>
+
+  <div class="mobile-dialog" id="mobile-dialog" hidden>
+    <button
+      class="mobile-dialog-backdrop"
+      type="button"
+      data-close-mobile-dialog
+      aria-label="关闭手机访问窗口"
+    ></button>
+    <section
+      class="mobile-dialog-card"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="mobile-dialog-title"
+    >
+      <div class="mobile-dialog-head">
+        <div>
+          <div class="eyebrow">REMOTE MOBILE ACCESS</div>
+          <h2 id="mobile-dialog-title">任意手机访问</h2>
+        </div>
+        <button
+          class="mobile-dialog-close"
+          type="button"
+          data-close-mobile-dialog
+          aria-label="关闭"
+        >×</button>
+      </div>
+      <p class="mobile-dialog-copy">
+        此链接可在蜂窝网络或其他 Wi-Fi 下打开，不需要手机和电脑处于同一网络。
+      </p>
+      <label class="mobile-link-field">
+        <span>专属访问链接</span>
+        <textarea
+          id="mobile-link"
+          rows="3"
+          readonly
+          spellcheck="false"
+          aria-live="polite"
+        ></textarea>
+      </label>
+      <div class="mobile-dialog-actions">
+        <button class="check-button" id="copy-mobile-link" type="button">复制链接</button>
+        <a class="mobile-preview-link" id="preview-mobile-link" href="#" target="_blank" rel="noopener">电脑预览</a>
+      </div>
+      <div class="mobile-dialog-note">
+        <strong>使用条件</strong>
+        <p>电脑保持开机且“A股资金脉搏”保持运行。程序重启后公网地址可能变化，重新点击“手机访问”即可获取新链接。</p>
+        <p>链接内含访问令牌，请勿公开发布。页面可从手机浏览器“添加到主屏幕”，作为网页应用使用。</p>
+      </div>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
