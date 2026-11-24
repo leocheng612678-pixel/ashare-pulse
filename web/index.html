@@ -59,7 +59,7 @@
   <main class="page-shell">
     <section class="hero panel">
       <div class="signal-block">
-        <div class="eyebrow">综合市场信号</div>
+        <div class="eyebrow">市场温度 · 四个方向合在一起看</div>
         <div class="score-layout">
           <div class="gauge" aria-label="综合评分">
             <svg viewBox="0 0 140 140" role="img">
@@ -68,13 +68,13 @@
             </svg>
             <div class="gauge-center">
               <strong id="market-score">--</strong>
-              <small>市场评分</small>
+              <small>市场温度分</small>
             </div>
           </div>
           <div class="signal-copy">
             <div class="regime-line">
               <span class="regime" id="market-regime">读取中</span>
-              <span class="confidence" id="confidence-badge">置信度 --</span>
+              <span class="confidence" id="confidence-badge">判断可靠度 --</span>
             </div>
             <h1 id="action-title">正在分析资金与市场广度</h1>
             <p id="action-summary">数据载入后，会给出仓位区间与分批执行条件。</p>
@@ -84,26 +84,119 @@
 
       <div class="metric-grid">
         <article class="metric-card">
-          <div class="metric-label">两市成交额</div>
+          <div class="metric-label">
+            <span>两市成交额</span>
+            <small>今天市场有多活跃</small>
+          </div>
           <strong class="metric-value" id="metric-turnover">--</strong>
           <span class="metric-note" id="metric-turnover-note">较20日均额 --</span>
         </article>
         <article class="metric-card">
-          <div class="metric-label">主力净流入</div>
+          <div class="metric-label">
+            <span>大单资金净流入</span>
+            <small>俗称“主力资金”</small>
+          </div>
           <strong class="metric-value" id="metric-flow">--</strong>
           <span class="metric-note" id="metric-flow-note">沪深指数口径</span>
         </article>
         <article class="metric-card">
-          <div class="metric-label">ARMS / TRIN</div>
+          <div class="metric-label">
+            <span>涨跌量能 ARMS</span>
+            <small>上涨和下跌谁更有量支持</small>
+          </div>
           <strong class="metric-value" id="metric-arms">--</strong>
           <span class="metric-note" id="metric-arms-note">全A涨跌量能结构</span>
         </article>
         <article class="metric-card">
-          <div class="metric-label">IF 主力基差</div>
+          <div class="metric-label">
+            <span>股指期货预期 IF</span>
+            <small>期货价相对现货价贵还是便宜</small>
+          </div>
           <strong class="metric-value" id="metric-basis">--</strong>
           <span class="metric-note" id="metric-basis-note">相对沪深300</span>
         </article>
       </div>
+    </section>
+
+    <section class="panel plain-language-panel" id="plain-language">
+      <div class="panel-heading">
+        <div>
+          <div class="eyebrow">PLAIN LANGUAGE / 白话解释</div>
+          <h2>不用懂术语，也能看懂今天该不该动手</h2>
+        </div>
+        <span class="panel-tag">大众版说明</span>
+      </div>
+
+      <p class="plain-intro">
+        把股市想成天气：成交额看“热闹不热闹”，大单资金看“有钱人在买还是卖”，
+        涨跌量能看“上涨有没有成交量支持”，股指期货看“专业资金对未来偏乐观还是谨慎”。
+        四个方向合起来，才形成市场温度分；温度分决定仓位，仓位再决定买、卖或空仓。
+      </p>
+
+      <div class="plain-metric-grid">
+        <article class="plain-card">
+          <span class="plain-kicker">01 · 人气</span>
+          <h3>成交额 = 市场有多热闹</h3>
+          <p>金额大，说明参与交易的人多、资金活跃；金额小，说明大家观望。</p>
+          <small>但“热闹”不等于一定上涨，还要看资金往哪边流。</small>
+        </article>
+        <article class="plain-card">
+          <span class="plain-kicker">02 · 方向</span>
+          <h3>大单资金 = 大钱在买还是卖</h3>
+          <p>净流入表示大单买入多于卖出，净流出则相反。</p>
+          <small>这里是从成交订单大小推算出来的，不代表真实机构持仓。</small>
+        </article>
+        <article class="plain-card">
+          <span class="plain-kicker">03 · 力量</span>
+          <h3>ARMS = 上涨和下跌谁更费量</h3>
+          <p>它比较上涨股票和下跌股票各自消耗了多少成交量，判断涨跌是否有量支持。</p>
+          <small>数值不能孤立使用；极低可能是少数股票吸走成交，需结合涨跌家数。</small>
+        </article>
+        <article class="plain-card">
+          <span class="plain-kicker">04 · 预期</span>
+          <h3>IF 基差 = 期货资金对未来的态度</h3>
+          <p>期货比现货贵叫升水，通常偏乐观；期货比现货便宜叫贴水，通常更谨慎。</p>
+          <small>贴水不代表一定下跌，还会受到分红、到期日和套保需求影响。</small>
+        </article>
+      </div>
+
+      <div class="relationship-flow" aria-label="市场判断关系图">
+        <div class="flow-step">
+          <b>先观察</b>
+          <span>趋势、大单资金、涨跌量能、期货预期</span>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div class="flow-step">
+          <b>再汇总</b>
+          <span>合成为 -100 到 +100 的市场温度分</span>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div class="flow-step">
+          <b>定仓位</b>
+          <span>股票和 ETF 最多用多少资金参与</span>
+        </div>
+        <i aria-hidden="true">→</i>
+        <div class="flow-step">
+          <b>最后执行</b>
+          <span>买入候选、减仓条件，或继续持币空仓</span>
+        </div>
+      </div>
+
+      <details class="plain-glossary">
+        <summary>展开完整白话词典</summary>
+        <div class="glossary-grid">
+          <div><b>市场温度分</b><span>把所有信号压缩成一个分数。越接近负数，风险越高；越接近正数，环境越友好。</span></div>
+          <div><b>判断可靠度</b><span>表示数据是否齐全、几个信号是否互相印证，不表示赚钱概率，也不保证判断正确。</span></div>
+          <div><b>趋势</b><span>看指数是在20日、60日均线上方还是下方，用来判断大方向。</span></div>
+          <div><b>四维信号</b><span>趋势、资金、广度、期指四个观察方向；合起来比只看一个指标更稳健。</span></div>
+          <div><b>广度</b><span>看全市场有多少股票上涨、多少下跌，判断是普涨普跌还是少数股票撑指数。</span></div>
+          <div><b>股票和ETF仓位参考</b><span>建议用于权益资产的比例区间，不是要求全部资金买入，也不是收益承诺。</span></div>
+          <div><b>主动选股</b><span>电脑按流动性、趋势、动量和风险独立筛出的观察名单，不等于无条件买入指令。</span></div>
+          <div><b>大资金雷达</b><span>通过大单、持续性和价格背离判断资金行为，属于推测，不是看到真实机构账户。</span></div>
+          <div><b>回测</b><span>用过去的数据重放同一套规则，检查历史上是否有效，以及最坏时可能亏多少。</span></div>
+          <div><b>自动调权</b><span>积累足够多的到期预测后，小幅调整四个方向的参考权重，避免追逐单日结果。</span></div>
+        </div>
+      </details>
     </section>
 
     <section class="panel asset-decision-panel">
@@ -120,20 +213,20 @@
           <strong id="asset-choice">--</strong>
           <p id="asset-reason">正在读取市场状态和资产条件。</p>
           <div class="decision-target">
-            <span>权益目标</span>
+            <span>股票 / ETF 仓位参考</span>
             <strong id="asset-target">--</strong>
           </div>
         </div>
         <div class="decision-column">
-          <h3><span class="decision-number">01</span> 买入</h3>
+          <h3><span class="decision-number">01</span> 可考虑的买入</h3>
           <div id="asset-buy" class="decision-copy">--</div>
         </div>
         <div class="decision-column">
-          <h3><span class="decision-number">02</span> 卖出 / 减仓</h3>
+          <h3><span class="decision-number">02</span> 卖出或减仓</h3>
           <div id="asset-sell" class="decision-copy">--</div>
         </div>
         <div class="decision-column cash-column">
-          <h3><span class="decision-number">03</span> 现金</h3>
+          <h3><span class="decision-number">03</span> 持币等待</h3>
           <div id="asset-cash" class="decision-copy">--</div>
         </div>
       </div>

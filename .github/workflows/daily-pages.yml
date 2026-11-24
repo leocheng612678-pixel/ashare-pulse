@@ -1,6 +1,13 @@
 name: A-share Daily Pages
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "web/**"
+      - "build_static.py"
+      - ".github/workflows/daily-pages.yml"
   schedule:
     - cron: "10 8 * * 1-5"
   workflow_dispatch:

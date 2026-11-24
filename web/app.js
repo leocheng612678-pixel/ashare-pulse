@@ -123,7 +123,8 @@ function renderScore(strategy) {
   const score = finite(strategy.score) ?? 0;
   $("market-score").textContent = `${score > 0 ? "+" : ""}${score.toFixed(0)}`;
   $("market-regime").textContent = strategy.regime || "待判断";
-  $("confidence-badge").textContent = `置信度 ${strategy.confidence ?? "--"}%`;
+  $("confidence-badge").textContent =
+    `判断可靠度 ${strategy.confidence ?? "--"}%`;
   $("action-title").textContent = strategy.action || "暂无判断";
   $("action-summary").textContent = strategy.summary || "";
 
@@ -363,7 +364,8 @@ function renderSources(data) {
   const sources = data.sources || {};
   const statusNames = { ok: "正常", cached: "缓存", error: "异常" };
   const entries = Object.entries(sources);
-  $("quality-label").textContent = `模型置信度 ${data.strategy?.confidence ?? "--"}%`;
+  $("quality-label").textContent =
+    `数据可信度 ${data.strategy?.confidence ?? "--"}%`;
   $("source-list").innerHTML = entries.length
     ? entries.map(([name, source]) => {
         const status = source.status || "error";
@@ -556,7 +558,8 @@ function renderActiveStocks(data) {
 
 function renderBigMoney(data, money) {
   if (!money) return;
-  $("money-confidence").textContent = `置信度 ${money.confidence || "低"}`;
+  $("money-confidence").textContent =
+    `推断可靠度 ${money.confidence || "低"}`;
   $("money-state").textContent = money.state || "数据不足";
   $("money-score").textContent =
     finite(money.score) === null
